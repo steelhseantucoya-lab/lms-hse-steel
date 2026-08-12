@@ -1,6 +1,6 @@
 
 const MODULES = [
-  {n:1,title:"CONOCE STEEL Y NUESTRA CULTURA HSE",duration:"14:30",video:"assets/videos/modulo01.mp4"},
+  {n:1,title:"CONOCE STEEL Y NUESTRA CULTURA HSE",duration:"10:46",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-01/modulo01_lms_1080p.mp4",recapPdf:"assets/docs/modulo01_conoce_steel_cultura_hse.pdf"},
   {n:2,title:"REGLAS QUE NO SE NEGOCIAN",duration:"13:30",video:"assets/videos/modulo02.mp4"},
   {n:3,title:"ANTES DE HACER, PIENSA",duration:"15:00",video:"assets/videos/modulo03.mp4"},
   {n:4,title:"CONTROLES CRÍTICOS — EdC",duration:"16:00",video:"assets/videos/modulo04.mp4"},
@@ -155,8 +155,7 @@ function renderModulePlayer(progress){
     <div class="stage done"><b>OBJETIVO</b><span>¿Qué aprenderás?</span></div>
     <div class="stage active"><b>VIDEO</b><span>En curso</span></div>
     <div class="stage ${progress.video_completed?"done":""}"><b>REPASO</b><span>${progress.video_completed?"Disponible":"Bloqueado"}</span></div>
-    <div class="stage ${progress.recap_completed?"done":""}"><b>CASO DE TERRENO</b><span>${progress.recap_completed?"Disponible":"Bloqueado"}</span></div>
-    <div class="stage ${progress.case_completed?"done":""}"><b>EVALUACIÓN</b><span>${progress.case_completed?"Disponible":"Bloqueado"}</span></div>
+    <div class="stage ${progress.recap_completed?"done":""}"><b>EVALUACIÓN</b><span>${progress.recap_completed?"Disponible":"Bloqueado"}</span></div>
   </section>
   <section class="content">
     <div class="action-row">
@@ -203,18 +202,66 @@ function updateVideoUI(){const v=$("#courseVideo");if(!v||!isFinite(v.duration))
 function fmt(s){s=Math.max(0,Math.floor(s||0));return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`}
 
 async function startRecap(){
-  const {data:p}=await sb.from("module_progress").select("*").eq("user_id",currentUser.id).eq("module_no",currentModule.n).single();
-  if(!p?.video_completed){alert("Debes terminar el video antes de continuar.");return}
-  shell(`<section class="module-header"><div><div class="eyebrow">MÓDULO ${String(currentModule.n).padStart(2,"0")} · REPASO</div><h1>${esc(currentModule.title)}</h1></div></section>
-  <section class="content"><div class="panel"><h2>REPASO VISUAL</h2><p>Revisa los conceptos clave del módulo antes del caso de terreno.</p>
-  <div class="summary-grid">
-    <div><b>PLANIFICA</b><span>Comprende la tarea y sus controles.</span></div>
-    <div><b>VERIFICA</b><span>Confirma que las barreras estén implementadas.</span></div>
-    <div><b>COMUNICA</b><span>Reporta cambios, desviaciones y condiciones inseguras.</span></div>
-    <div><b>DETÉN</b><span>Si el riesgo no está controlado, no continúes.</span></div>
-  </div><button class="primary" onclick="completeRecap()">CONTINUAR AL CASO DE TERRENO</button></div></section>`,false,"route");
+  const {data:p}=await sb.from("module_progress")
+    .select("*")
+    .eq("user_id",currentUser.id)
+    .eq("module_no",currentModule.n)
+    .single();
+
+  if(!p?.video_completed){
+    alert("Debes terminar el video antes de continuar.");
+    return;
+  }
+
+  const pdf=currentModule.recapPdf||"";
+
+  shell(`
+    <section class="module-header">
+      <div>
+        <div class="eyebrow">
+          MÓDULO ${String(currentModule.n).padStart(2,"0")} · REPASO
+        </div>
+        <h1>${esc(currentModule.title)}</h1>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="panel">
+        <h2>REPASO DEL MÓDULO</h2>
+        <p>Revisa y descarga el material antes de rendir la evaluación.</p>
+
+        <div style="margin:24px 0;padding:22px;border:1px solid #d8e0e6;border-radius:12px;background:#fff">
+          <h3>MÓDULO 01 — CONOCE STEEL Y NUESTRA CULTURA HSE</h3>
+          <p>Material oficial de repaso en formato PDF.</p>
+
+          <a class="primary"
+             href="${esc(pdf)}"
+             target="_blank"
+             rel="noopener">
+            DESCARGAR PDF DEL MÓDULO 01
+          </a>
+        </div>
+
+        <button class="primary" onclick="completeRecap()">
+          CONTINUAR A LA EVALUACIÓN
+        </button>
+      </div>
+    </section>
+  `,false,"route");
 }
-async function completeRecap(){await sb.from("module_progress").update({recap_completed:true,updated_at:new Date().toISOString()}).eq("user_id",currentUser.id).eq("module_no",currentModule.n);startCase()}
+
+async function completeRecap(){
+  await sb.from("module_progress")
+    .update({
+      recap_completed:true,
+      case_completed:true,
+      updated_at:new Date().toISOString()
+    })
+    .eq("user_id",currentUser.id)
+    .eq("module_no",currentModule.n);
+
+  loadAssessment();
+}
 function startCase(){
   shell(`<section class="module-header"><div><div class="eyebrow">MÓDULO ${String(currentModule.n).padStart(2,"0")} · CASO DE TERRENO</div><h1>${esc(currentModule.title)}</h1></div></section>
   <section class="content"><div class="panel"><h2>CAMBIÓ LA CONDICIÓN DE TRABAJO</h2><p>Durante la ejecución detectas que uno de los controles definidos ya no puede aplicarse como estaba planificado.</p>
