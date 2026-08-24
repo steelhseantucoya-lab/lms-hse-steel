@@ -90,7 +90,56 @@ function shell(content,admin=false,active="home"){
     </main>
   </div>`);
 }
+async function workerHome(){
+  const {data:rows} = await sb
+    .from("module_progress")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("module_no");
 
+  const progress = rows || [];
+  const completed = progress.filter(x => x.status === "approved").length;
+  const percent = Math.round((completed / 10) * 100);
+
+  shell(`
+    <section class="hero">
+      <div class="eyebrow">INDUCCIÓN HOMBRE NUEVO</div>
+
+      <h1>BIENVENIDO, ${esc(currentProfile.full_name)}</h1>
+
+      <p>
+        Continúa tu proceso de inducción HSE.
+        Tu avance y resultados quedan registrados automáticamente.
+      </p>
+
+      <div class="progress">
+        <span style="width:${percent}%"></span>
+      </div>
+
+      <b>${completed}/10 MÓDULOS COMPLETADOS</b>
+    </section>
+
+    <section class="content">
+      <div class="panel">
+        <h2>ESTADO DE TU INDUCCIÓN</h2>
+
+        <p>
+          Has aprobado <b>${completed}</b> de 10 módulos.
+        </p>
+
+        <div class="action-row">
+          <button class="primary" onclick="workerDashboard()">
+            CONTINUAR MI RUTA HSE
+          </button>
+
+          <button class="secondary" onclick="workerProgress()">
+            VER MI PROGRESO
+          </button>
+        </div>
+      </div>
+    </section>
+  `, false, "home");
+}
 async function workerDashboard(){
   const {data:rows}=await sb.from("module_progress").select("*").eq("user_id",currentUser.id).order("module_no");
   const progress=rows||[];
