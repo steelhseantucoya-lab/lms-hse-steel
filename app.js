@@ -179,44 +179,42 @@ function setupVideo(savedMax,alreadyCompleted){
 // MODO PRUEBA: permite velocidad 2x y adelantar libremente
 v.addEventListener("ratechange", () => {});
 v.addEventListener("seeking", () => {});
-  });
-  v.addEventListener("timeupdate",async()=>{
-  if(v.currentTime>maxAllowed) maxAllowed=v.currentTime;
+v.addEventListener("timeupdate", async () => {
+  if (v.currentTime > maxAllowed) maxAllowed = v.currentTime;
   updateVideoUI();
 
   // Marca el video como completado al llegar prácticamente al final
-  // Marca el video como completado al llegar prácticamente al final
-if (
-  isFinite(v.duration) &&
-  v.duration > 0 &&
-  v.currentTime >= v.duration - 1
-) {
-  maxAllowed = v.duration;
+  if (
+    isFinite(v.duration) &&
+    v.duration > 0 &&
+    v.currentTime >= v.duration - 1
+  ) {
+    maxAllowed = v.duration;
 
-  const { data, error } = await sb
-    .from("module_progress")
-    .update({
-      max_video_seconds: Math.floor(v.duration),
-      video_completed: true,
-      status: "in_progress",
-      updated_at: new Date().toISOString()
-    })
-    .eq("user_id", currentUser.id)
-    .eq("module_no", currentModule.n)
-    .select();
+    const { data, error } = await sb
+      .from("module_progress")
+      .update({
+        max_video_seconds: Math.floor(v.duration),
+        video_completed: true,
+        status: "in_progress",
+        updated_at: new Date().toISOString()
+      })
+      .eq("user_id", currentUser.id)
+      .eq("module_no", currentModule.n)
+      .select();
 
-  if (error) {
-    console.error("ERROR AL COMPLETAR VIDEO:", error);
-    alert("Error guardando finalización del video: " + error.message);
+    if (error) {
+      console.error("ERROR AL COMPLETAR VIDEO:", error);
+      alert("Error guardando finalización del video: " + error.message);
+      return;
+    }
+
+    console.log("VIDEO COMPLETADO GUARDADO:", data);
+
+    continueBtn.disabled = false;
+    continueBtn.textContent = "CONTINUAR AL REPASO";
     return;
   }
-
-  console.log("VIDEO COMPLETADO GUARDADO:", data);
-
-  continueBtn.disabled = false;
-  continueBtn.textContent = "CONTINUAR AL REPASO";
-  return;
-}
 
   if(Math.floor(v.currentTime)-lastSave>=8){
     lastSave=Math.floor(v.currentTime);
