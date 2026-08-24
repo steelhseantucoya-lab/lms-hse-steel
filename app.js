@@ -185,26 +185,38 @@ v.addEventListener("seeking", () => {});
   updateVideoUI();
 
   // Marca el video como completado al llegar prácticamente al final
-  if(
-    isFinite(v.duration) &&
-    v.duration > 0 &&
-    v.currentTime >= v.duration - 1
-  ){
-    maxAllowed = v.duration;
+  // Marca el video como completado al llegar prácticamente al final
+if (
+  isFinite(v.duration) &&
+  v.duration > 0 &&
+  v.currentTime >= v.duration - 1
+) {
+  maxAllowed = v.duration;
 
-    await sb.from("module_progress").update({
+  const { data, error } = await sb
+    .from("module_progress")
+    .update({
       max_video_seconds: Math.floor(v.duration),
       video_completed: true,
       status: "in_progress",
       updated_at: new Date().toISOString()
     })
-    .eq("user_id",currentUser.id)
-    .eq("module_no",currentModule.n);
+    .eq("user_id", currentUser.id)
+    .eq("module_no", currentModule.n)
+    .select();
 
-    continueBtn.disabled = false;
-    continueBtn.textContent = "CONTINUAR AL REPASO";
+  if (error) {
+    console.error("ERROR AL COMPLETAR VIDEO:", error);
+    alert("Error guardando finalización del video: " + error.message);
     return;
   }
+
+  console.log("VIDEO COMPLETADO GUARDADO:", data);
+
+  continueBtn.disabled = false;
+  continueBtn.textContent = "CONTINUAR AL REPASO";
+  return;
+}
 
   if(Math.floor(v.currentTime)-lastSave>=8){
     lastSave=Math.floor(v.currentTime);
