@@ -181,20 +181,43 @@ function setupVideo(savedMax,alreadyCompleted){
     if(v.currentTime>maxAllowed+1.2) v.currentTime=maxAllowed;
   });
   v.addEventListener("timeupdate",async()=>{
-    if(v.currentTime>maxAllowed) maxAllowed=v.currentTime;
-    updateVideoUI();
-    if(Math.floor(v.currentTime)-lastSave>=8){
-      lastSave=Math.floor(v.currentTime);
-      await sb.from("module_progress").update({max_video_seconds:Math.floor(maxAllowed),status:"in_progress",updated_at:new Date().toISOString()}).eq("user_id",currentUser.id).eq("module_no",currentModule.n);
-    }
-  });
-  v.addEventListener("ended",async()=>{
-    maxAllowed=v.duration;
-    await sb.from("module_progress").update({max_video_seconds:Math.floor(v.duration),video_completed:true,status:"in_progress",updated_at:new Date().toISOString()}).eq("user_id",currentUser.id).eq("module_no",currentModule.n);
-    continueBtn.disabled=false;
-    continueBtn.textContent="CONTINUAR AL REPASO";
-    playBtn.textContent="↻";
-  });
+  if(v.currentTime>maxAllowed) maxAllowed=v.currentTime;
+  updateVideoUI();
+
+  // Marca el video como completado al llegar prácticamente al final
+  if(
+    isFinite(v.duration) &&
+    v.duration > 0 &&
+    v.currentTime >= v.duration - 1
+  ){
+    maxAllowed = v.duration;
+
+    await sb.from("module_progress").update({
+      max_video_seconds: Math.floor(v.duration),
+      video_completed: true,
+      status: "in_progress",
+      updated_at: new Date().toISOString()
+    })
+    .eq("user_id",currentUser.id)
+    .eq("module_no",currentModule.n);
+
+    continueBtn.disabled = false;
+    continueBtn.textContent = "CONTINUAR AL REPASO";
+    return;
+  }
+
+  if(Math.floor(v.currentTime)-lastSave>=8){
+    lastSave=Math.floor(v.currentTime);
+
+    await sb.from("module_progress").update({
+      max_video_seconds:Math.floor(maxAllowed),
+      status:"in_progress",
+      updated_at:new Date().toISOString()
+    })
+    .eq("user_id",currentUser.id)
+    .eq("module_no",currentModule.n);
+  }
+});
 }
 function togglePlay(){const v=$("#courseVideo");if(v.paused)v.play();else v.pause();updatePlayButton()}
 function updatePlayButton(){const v=$("#courseVideo");$("#playBtn").textContent=v.paused?"▶":"❚❚"}
