@@ -67,8 +67,8 @@ async function logout(){ try{await sb.auth.signOut()}catch(e){} currentUser=null
 
 function shell(content,admin=false,active="home"){
   const workerNav = `
-    <button class="nav ${active==="home"?"active":""}" onclick="workerDashboard()">INICIO</button>
-    <button class="nav ${active==="route"?"active":""}" onclick="workerDashboard()">MI RUTA HSE</button>
+<button class="nav ${active==="home"?"active":""}" onclick="workerHome()">INICIO</button>
+<button class="nav ${active==="route"?"active":""}" onclick="workerDashboard()">MI RUTA HSE</button>
     <button class="nav ${active==="progress"?"active":""}" onclick="workerProgress()">PROGRESO</button>
     <button class="nav ${active==="cert"?"active":""}" onclick="workerCertificate()">CERTIFICADO</button>`;
   const adminNav = `
