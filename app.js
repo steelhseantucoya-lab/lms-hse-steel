@@ -249,26 +249,36 @@ async function startRecap(){
     </section>
 
     <section class="content">
-      <div class="panel">
-        <h2>REPASO DEL MÓDULO</h2>
-        <p>Revisa y descarga el material antes de rendir la evaluación.</p>
+<div class="panel">
+  <h2>REPASO DEL MÓDULO</h2>
 
-        <div style="margin:24px 0;padding:22px;border:1px solid #d8e0e6;border-radius:12px;background:#fff">
-          <h3>MÓDULO 01 — CONOCE STEEL Y NUESTRA CULTURA HSE</h3>
-          <p>Material oficial de repaso en formato PDF.</p>
+  <div style="margin:18px 0;padding:20px;border:1px solid #d8e0e6;border-radius:12px;background:#fff">
+    <h3>MÓDULO 01 — CONOCE STEEL Y NUESTRA CULTURA HSE</h3>
 
-          <a class="primary"
-             href="${esc(pdf)}"
-             target="_blank"
-             rel="noopener">
-            DESCARGAR PDF DEL MÓDULO 01
-          </a>
-        </div>
+    <p>
+      En STEEL vivimos una cultura preventiva basada en anticipar los riesgos,
+      cumplir los controles, actuar a tiempo y cuidarnos entre todos.
+    </p>
 
-        <button class="primary" onclick="completeRecap()">
-          CONTINUAR A LA EVALUACIÓN
-        </button>
-      </div>
+    <p><b>Recuerda:</b> seguridad, compromiso y responsabilidad en cada tarea.</p>
+  </div>
+
+  <div style="margin:18px 0;padding:20px;border:1px solid #f36f21;border-radius:12px;background:#fff">
+    <h3>MATERIAL DE APOYO</h3>
+    <p>Descarga el PDF del Módulo 01 para consultar el contenido cuando lo necesites.</p>
+
+    <a class="primary"
+       href="${esc(pdf)}"
+       target="_blank"
+       rel="noopener">
+      DESCARGAR PDF DEL MÓDULO 01
+    </a>
+  </div>
+
+  <button class="primary" onclick="completeRecap()">
+    CONTINUAR A LA EVALUACIÓN
+  </button>
+</div>
     </section>
   `,false,"route");
 }
