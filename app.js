@@ -1,6 +1,6 @@
 
 const MODULES = [
-  {n:1,title:"CONOCE STEEL Y NUESTRA CULTURA HSE",duration:"10:46",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-01/modulo01_lms_1080p.mp4",recapPdf:"assets/docs/modulo01_conoce_steel_cultura_hse.pdf"},
+  {n:1,title:"CONOCE STEEL Y NUESTRA CULTURA HSE",duration:"10:46",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-01/modulo_01_lms_1080p.mp4",recapPdf:"assets/docs/modulo01_conoce_steel_cultura_hse.pdf"},
   {n:2,title:"REGLAS QUE NO SE NEGOCIAN",duration:"13:30",video:"assets/videos/modulo02.mp4"},
   {n:3,title:"ANTES DE HACER, PIENSA",duration:"15:00",video:"assets/videos/modulo03.mp4"},
   {n:4,title:"CONTROLES CRÍTICOS — EdC",duration:"16:00",video:"assets/videos/modulo04.mp4"},
