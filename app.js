@@ -176,9 +176,9 @@ function setupVideo(savedMax,alreadyCompleted){
     if(maxAllowed>0 && maxAllowed<v.duration) v.currentTime=Math.min(maxAllowed,v.duration);
     updateVideoUI();
   });
-  v.addEventListener("ratechange",()=>{ if(v.playbackRate!==1) v.playbackRate=1; });
-  v.addEventListener("seeking",()=>{
-    if(v.currentTime>maxAllowed+1.2) v.currentTime=maxAllowed;
+// MODO PRUEBA: permite velocidad 2x y adelantar libremente
+v.addEventListener("ratechange", () => {});
+v.addEventListener("seeking", () => {});
   });
   v.addEventListener("timeupdate",async()=>{
   if(v.currentTime>maxAllowed) maxAllowed=v.currentTime;
