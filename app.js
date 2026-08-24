@@ -171,7 +171,7 @@ function setupVideo(savedMax,alreadyCompleted){
   let maxAllowed=Math.max(0,Number(savedMax||0));
   let lastSave=0;
   v.playbackRate=1;
-  v.addEventListener("error",()=>{missing.hidden=false;});
+  v.addEventListener("error",()=>{console.error("Error de video:",v.error);});
   v.addEventListener("loadedmetadata",()=>{
     if(maxAllowed>0 && maxAllowed<v.duration) v.currentTime=Math.min(maxAllowed,v.duration);
     updateVideoUI();
