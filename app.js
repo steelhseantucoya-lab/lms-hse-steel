@@ -150,7 +150,7 @@ async function workerDashboard(){
     return `<div class="module-card ${unlocked?"":"locked"}" ${unlocked?`onclick="openModule(${m.n})"`:""}>
       <div class="module-visual module-${m.n}">
         <div class="module-no">${String(m.n).padStart(2,"0")}</div>
-        <div class="module-icon">${["HSE","RC","ARTP","EdC","GAS","SOS","VER","APTO","360°","FINAL"][m.n-1]}</div>
+        <div class="module-icon">${["HSE","RC","PASO 0","EdC","GAS","SOS","VER","APTO","360°","FINAL"][m.n-1]}</div>
       </div>
       <div class="module-info">
         <h3>${esc(m.title)}</h3>
