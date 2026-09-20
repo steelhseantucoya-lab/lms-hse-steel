@@ -2,7 +2,7 @@
 const MODULES = [
   {n:1,title:"CONOCE STEEL Y NUESTRA CULTURA HSE",duration:"10:46",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-01/modulo_01_lms_1080p.mp4",recapPdf:"assets/docs/modulo01_conoce_steel_cultura_hse.pdf"},
   {n:2,title:"REGLAS QUE NO SE NEGOCIAN",duration:"09:56",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-02/MODULO.2.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-02/MODULO.2.pdf"},
-  {n:3,title:"ANTES DE HACER, PIENSA",duration:"15:00",video:"assets/videos/modulo03.mp4"},
+  {n:3,title:"ANTES DE HACER, PIENSA",duration:"09:14",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-03/MODULO.3.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-03/MODULO.3.pdf"},
   {n:4,title:"CONTROLES CRÍTICOS — EdC",duration:"16:00",video:"assets/videos/modulo04.mp4"},
   {n:5,title:"AGENTES PELIGROSOS",duration:"14:00",video:"assets/videos/modulo05.mp4"},
   {n:6,title:"EMERGENCIAS",duration:"13:30",video:"assets/videos/modulo06.mp4"},
@@ -300,6 +300,12 @@ async function startRecap(){
   }
 
   const pdf=currentModule.recapPdf||"";
+  const recapMessages={
+    1:"En STEEL vivimos una cultura preventiva basada en anticipar los riesgos, cumplir los controles, actuar a tiempo y cuidarnos entre todos.",
+    2:"Las reglas que no se negocian protegen la vida y deben cumplirse siempre, sin excepciones ni atajos.",
+    3:"Antes de comenzar una tarea, detente y piensa: identifica los peligros, evalúa los riesgos y confirma que los controles estén implementados y sean efectivos."
+  };
+  const recapMessage=recapMessages[currentModule.n]||"Repasa los conceptos principales del módulo y verifica los controles antes de continuar.";
 
   shell(`
     <section class="module-header">
@@ -318,9 +324,7 @@ async function startRecap(){
   <div style="margin:18px 0;padding:20px;border:1px solid #d8e0e6;border-radius:12px;background:#fff">
     <h3>MÓDULO ${String(currentModule.n).padStart(2,"0")} — ${esc(currentModule.title)}</h3>
 
-    <p>${currentModule.n===2
-      ?"Las reglas que no se negocian protegen la vida y deben cumplirse siempre, sin excepciones ni atajos."
-      :"En STEEL vivimos una cultura preventiva basada en anticipar los riesgos, cumplir los controles, actuar a tiempo y cuidarnos entre todos."}</p>
+    <p>${esc(recapMessage)}</p>
 
     <p><b>Recuerda:</b> ante una condición insegura, detén la tarea, comunica y restablece los controles antes de continuar.</p>
   </div>
