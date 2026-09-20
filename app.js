@@ -1,7 +1,7 @@
 
 const MODULES = [
   {n:1,title:"CONOCE STEEL Y NUESTRA CULTURA HSE",duration:"10:46",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-01/modulo_01_lms_1080p.mp4",recapPdf:"assets/docs/modulo01_conoce_steel_cultura_hse.pdf"},
-  {n:2,title:"REGLAS QUE NO SE NEGOCIAN",duration:"13:30",video:"assets/videos/modulo02.mp4"},
+  {n:2,title:"REGLAS QUE NO SE NEGOCIAN",duration:"09:56",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-02/MODULO.2.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-02/MODULO.2.pdf"},
   {n:3,title:"ANTES DE HACER, PIENSA",duration:"15:00",video:"assets/videos/modulo03.mp4"},
   {n:4,title:"CONTROLES CRÍTICOS — EdC",duration:"16:00",video:"assets/videos/modulo04.mp4"},
   {n:5,title:"AGENTES PELIGROSOS",duration:"14:00",video:"assets/videos/modulo05.mp4"},
@@ -220,7 +220,11 @@ function setupVideo(savedMax,alreadyCompleted){
   let maxAllowed=Math.max(0,Number(savedMax||0));
   let lastSave=0;
   v.playbackRate=1;
-  v.addEventListener("error",()=>{console.error("Error de video:",v.error);});
+  v.addEventListener("error",()=>{
+    console.error("Error de video:",v.error);
+    missing.hidden=false;
+    playBtn.disabled=true;
+  });
   v.addEventListener("loadedmetadata",()=>{
     if(maxAllowed>0 && maxAllowed<v.duration) v.currentTime=Math.min(maxAllowed,v.duration);
     updateVideoUI();
@@ -312,26 +316,25 @@ async function startRecap(){
   <h2>REPASO DEL MÓDULO</h2>
 
   <div style="margin:18px 0;padding:20px;border:1px solid #d8e0e6;border-radius:12px;background:#fff">
-    <h3>MÓDULO 01 — CONOCE STEEL Y NUESTRA CULTURA HSE</h3>
+    <h3>MÓDULO ${String(currentModule.n).padStart(2,"0")} — ${esc(currentModule.title)}</h3>
 
-    <p>
-      En STEEL vivimos una cultura preventiva basada en anticipar los riesgos,
-      cumplir los controles, actuar a tiempo y cuidarnos entre todos.
-    </p>
+    <p>${currentModule.n===2
+      ?"Las reglas que no se negocian protegen la vida y deben cumplirse siempre, sin excepciones ni atajos."
+      :"En STEEL vivimos una cultura preventiva basada en anticipar los riesgos, cumplir los controles, actuar a tiempo y cuidarnos entre todos."}</p>
 
-    <p><b>Recuerda:</b> seguridad, compromiso y responsabilidad en cada tarea.</p>
+    <p><b>Recuerda:</b> ante una condición insegura, detén la tarea, comunica y restablece los controles antes de continuar.</p>
   </div>
 
   <div style="margin:18px 0;padding:20px;border:1px solid #f36f21;border-radius:12px;background:#fff">
     <h3>MATERIAL DE APOYO</h3>
-    <p>Descarga el PDF del Módulo 01 para consultar el contenido cuando lo necesites.</p>
+    <p>Abre el PDF del Módulo ${String(currentModule.n).padStart(2,"0")} para reforzar el contenido.</p>
 
-    <a class="primary"
+    ${pdf ? `<a class="primary"
        href="${esc(pdf)}"
        target="_blank"
        rel="noopener">
-      DESCARGAR PDF DEL MÓDULO 01
-    </a>
+      ABRIR PDF DEL MÓDULO ${String(currentModule.n).padStart(2,"0")}
+    </a>` : `<div class="warning">El PDF de repaso aún no está disponible.</div>`}
   </div>
 
   <button class="primary" onclick="completeRecap()">
