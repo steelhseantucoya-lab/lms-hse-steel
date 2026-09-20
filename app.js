@@ -4,7 +4,7 @@ const MODULES = [
   {n:2,title:"REGLAS QUE NO SE NEGOCIAN",duration:"09:56",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-02/MODULO.2.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-02/MODULO.2.pdf"},
   {n:3,title:"ANTES DE HACER, PIENSA",duration:"09:14",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-03/MODULO.3.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-03/MODULO.3.pdf"},
   {n:4,title:"CONTROLES CRÍTICOS — EdC",duration:"10:23",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-04/MODULO.4.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-04/MODULO.4.pdf"},
-  {n:5,title:"AGENTES PELIGROSOS",duration:"14:00",video:"assets/videos/modulo05.mp4"},
+  {n:5,title:"AGENTES PELIGROSOS",duration:"11:30",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-05/MODULO.5.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-05/MODULO.5.pdf"},
   {n:6,title:"EMERGENCIAS",duration:"13:30",video:"assets/videos/modulo06.mp4"},
   {n:7,title:"YO VEO · YO ACTÚO · YO REPORTO",duration:"13:30",video:"assets/videos/modulo07.mp4"},
   {n:8,title:"APTITUD PARA TRABAJAR",duration:"12:30",video:"assets/videos/modulo08.mp4"},
@@ -304,7 +304,8 @@ async function startRecap(){
     1:"En STEEL vivimos una cultura preventiva basada en anticipar los riesgos, cumplir los controles, actuar a tiempo y cuidarnos entre todos.",
     2:"Las reglas que no se negocian protegen la vida y deben cumplirse siempre, sin excepciones ni atajos.",
     3:"Antes de comenzar una tarea, detente y piensa: identifica los peligros, evalúa los riesgos y confirma que los controles estén implementados y sean efectivos.",
-    4:"Los controles críticos evitan consecuencias graves o fatales. Antes de ejecutar, verifica en terreno que cada control del EdC esté presente, implementado y sea efectivo."
+    4:"Los controles críticos evitan consecuencias graves o fatales. Antes de ejecutar, verifica en terreno que cada control del EdC esté presente, implementado y sea efectivo.",
+    5:"Reconoce los agentes peligrosos presentes en la tarea, conoce sus vías de exposición y aplica los controles definidos: monitoreo, segregación, ventilación, higiene y EPP adecuado."
   };
   const recapMessage=recapMessages[currentModule.n]||"Repasa los conceptos principales del módulo y verifica los controles antes de continuar.";
 
