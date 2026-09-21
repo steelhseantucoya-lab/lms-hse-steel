@@ -9,7 +9,7 @@ const MODULES = [
   {n:7,title:"YO VEO · YO ACTÚO · YO REPORTO",duration:"12:29",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-07/MODULO.7.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-07/MODULO.7.pdf"},
   {n:8,title:"APTITUD PARA TRABAJAR",duration:"11:23",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-08/MODULO.8.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-08/MODULO.8.pdf"},
   {n:9,title:"VIVIR LA SEGURIDAD EN TERRENO",duration:"10:19",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-09/MODULO.9.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-09/MODULO.9.pdf"},
-  {n:10,title:"DESAFÍO FINAL HSE STEEL",duration:"18:00",video:"assets/videos/modulo10.mp4"}
+  {n:10,title:"EVALUACIÓN FINAL HSE STEEL",duration:"",finalAssessment:true}
 ];
 
 const moduleByNo = n => MODULES.find(m=>m.n===Number(n));
@@ -154,7 +154,7 @@ async function workerDashboard(){
       </div>
       <div class="module-info">
         <h3>${esc(m.title)}</h3>
-        <p>${m.duration} min</p>
+        <p>${m.finalAssessment?"EVALUACIÓN INTEGRADA":`${m.duration} min`}</p>
         <span class="pill ${p?.status==="approved"?"ok":""}">${p?.status==="approved"?"APROBADO":unlocked?"DISPONIBLE":"BLOQUEADO"}</span>
       </div>
     </div>`;
@@ -168,7 +168,26 @@ async function workerDashboard(){
 async function openModule(n){
   currentModule=moduleByNo(n);
   const {data:p}=await sb.from("module_progress").select("*").eq("user_id",currentUser.id).eq("module_no",n).single();
+  if(n===10){renderFinalAssessmentIntro(p||{});return}
   renderModulePlayer(p||{});
+}
+
+function renderFinalAssessmentIntro(progress){
+  const approved=progress.status==="approved";
+  shell(`<section class="module-header">
+    <div><div class="eyebrow">MÓDULO 10 · EVALUACIÓN FINAL</div><h1>EVALUACIÓN FINAL HSE STEEL</h1></div>
+    <div class="duration">MÓDULOS 01 AL 09</div>
+  </section>
+  <section class="content"><div class="panel">
+    <h2>${approved?"CURSO APROBADO":"DEMUESTRA LO APRENDIDO"}</h2>
+    <p>Esta evaluación integra los contenidos de todos los módulos anteriores. Contiene <b>10 preguntas</b>: al menos una de cada Módulo 1 al 9 y una pregunta adicional.</p>
+    <div style="margin:18px 0;padding:18px;border:1px solid #f36f21;border-radius:12px;background:#fff">
+      <p><b>Exigencia de aprobación:</b> mínimo 80% y ninguna respuesta crítica incorrecta.</p>
+      <p>Al aprobar, finalizarás el curso LMS HSE STEEL y se habilitará tu certificado.</p>
+    </div>
+    ${approved?'<div class="success">Evaluación final aprobada. Tu certificado está disponible.</div><button class="primary" onclick="workerCertificate()">VER CERTIFICADO</button>':'<button class="primary" onclick="loadAssessment()">COMENZAR EVALUACIÓN FINAL</button>'}
+    <button class="secondary" onclick="workerDashboard()">← VOLVER A MI RUTA</button>
+  </div></section>`,false,"route");
 }
 
 function renderModulePlayer(progress){
@@ -400,7 +419,7 @@ async function submitAssessment(data){
   for(const q of data.questions){const s=document.querySelector(`input[name="q_${q.id}"]:checked`);if(!s){$("#evalMsg").innerHTML='<div class="warning">Debes responder todas las preguntas.</div>';return}answers.push({question_id:q.id,option:s.value})}
   const {data:r,error}=await sb.functions.invoke("submit-module-assessment",{body:{module_no:currentModule.n,answers,started_at:new Date().toISOString()}});
   if(error||r?.error){alert(r?.error||error.message);return}
-  shell(`<section class="hero"><div class="eyebrow">RESULTADO</div><h1>${r.passed?"MÓDULO APROBADO":"REFUERZO REQUERIDO"}</h1><p>Nota: <b>${r.score}%</b> · Fallas críticas: <b>${r.critical_failures||0}</b> · Intento: <b>${r.attempts||1}</b></p></section>
+  shell(`<section class="hero"><div class="eyebrow">RESULTADO</div><h1>${r.passed?(currentModule.n===10?"CURSO LMS APROBADO":"MÓDULO APROBADO"):"REFUERZO REQUERIDO"}</h1><p>Nota: <b>${r.score}%</b> · Fallas críticas: <b>${r.critical_failures||0}</b> · Intento: <b>${r.attempts||1}</b></p></section>
   <section class="content"><button class="primary" onclick="workerDashboard()">VOLVER A MI RUTA HSE</button></section>`,false,"route");
 }
 
@@ -475,7 +494,7 @@ async function createWorker(){
   setTimeout(adminWorkers,700);
 }
 
-async function adminModules(){shell(`<section class="content"><h1>MÓDULOS</h1><div class="module-grid">${MODULES.map(m=>`<div class="module-card"><div class="module-visual module-${m.n}"><div class="module-no">${String(m.n).padStart(2,"0")}</div></div><div class="module-info"><h3>${esc(m.title)}</h3><p>${m.duration} min</p><span class="pill ok">PUBLICADO</span></div></div>`).join("")}</div></section>`,true,"modules")}
+async function adminModules(){shell(`<section class="content"><h1>MÓDULOS</h1><div class="module-grid">${MODULES.map(m=>`<div class="module-card"><div class="module-visual module-${m.n}"><div class="module-no">${String(m.n).padStart(2,"0")}</div></div><div class="module-info"><h3>${esc(m.title)}</h3><p>${m.finalAssessment?"EVALUACIÓN INTEGRADA":`${m.duration} min`}</p><span class="pill ok">PUBLICADO</span></div></div>`).join("")}</div></section>`,true,"modules")}
 async function adminResults(){shell(`<section class="content"><div class="panel"><h1>RESULTADOS Y BRECHAS</h1><p>Notas, intentos y fallas críticas quedan almacenadas en Supabase.</p></div></section>`,true,"results")}
 async function adminCertificates(){shell(`<section class="content"><div class="panel"><h1>CERTIFICADOS</h1><p>Vigencia de 1 año desde la emisión.</p></div></section>`,true,"certs")}
 
