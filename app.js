@@ -13,7 +13,7 @@ const MODULES = [
 ];
 
 const moduleByNo = n => MODULES.find(m=>m.n===Number(n));
-let sb=null,currentUser=null,currentProfile=null,currentModule=null;
+let sb=null,currentUser=null,currentProfile=null,currentModule=null,currentCertificate=null;
 const cfg=window.STEEL_LMS_CONFIG||{};
 if(cfg.SUPABASE_URL && cfg.SUPABASE_PUBLISHABLE_KEY){
   sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_PUBLISHABLE_KEY);
@@ -424,7 +424,80 @@ async function submitAssessment(data){
 }
 
 async function workerProgress(){workerDashboard()}
-async function workerCertificate(){shell(`<section class="content"><div class="panel"><h2>CERTIFICADO</h2><p>Se habilita al aprobar los 10 módulos. Vigencia: 1 año desde la fecha de emisión.</p></div></section>`,false,"cert")}
+function formatCertificateDate(value){
+  if(!value)return "—";
+  const [y,m,d]=String(value).slice(0,10).split("-");
+  return `${d}-${m}-${y}`;
+}
+async function workerCertificate(){
+  shell(`<section class="content"><div class="panel"><h2>CERTIFICADO</h2><p>Cargando certificado...</p></div></section>`,false,"cert");
+  const {data:cert,error}=await sb.from("certificates").select("*")
+    .eq("user_id",currentUser.id).eq("status","valid")
+    .order("issued_at",{ascending:false}).limit(1).maybeSingle();
+  if(error){
+    shell(`<section class="content"><div class="panel"><h2>CERTIFICADO</h2><div class="warning">No fue posible consultar el certificado: ${esc(error.message)}</div></div></section>`,false,"cert");
+    return;
+  }
+  if(!cert){
+    shell(`<section class="content"><div class="panel"><h2>CERTIFICADO</h2><div class="warning">Aún no existe un certificado vigente. Verifica que los 10 módulos estén aprobados.</div></div></section>`,false,"cert");
+    return;
+  }
+  currentCertificate=cert;
+  shell(`<section class="content">
+    <div class="certificate-preview">
+      <div class="certificate-border">
+        <div class="certificate-brand">STEEL <span>HSE LMS</span></div>
+        <div class="certificate-kicker">CERTIFICADO DE APROBACIÓN</div>
+        <h1>INDUCCIÓN HOMBRE NUEVO</h1>
+        <p>STEEL INGENIERÍA certifica que</p>
+        <h2>${esc(currentProfile.full_name||"")}</h2>
+        <p class="certificate-rut">RUT: ${esc(currentProfile.rut||"—")}</p>
+        <p>ha aprobado satisfactoriamente los 10 módulos y la evaluación final del curso LMS HSE STEEL.</p>
+        <div class="certificate-data">
+          <div><b>EMISIÓN</b><span>${formatCertificateDate(cert.issued_at)}</span></div>
+          <div><b>VIGENCIA</b><span>${formatCertificateDate(cert.expires_at)}</span></div>
+          <div><b>CÓDIGO</b><span>${esc(cert.certificate_code)}</span></div>
+        </div>
+        <div class="certificate-footer">STEEL INGENIERÍA · ANTUCOYA · ${esc(cert.lms_version||"LMS HSE")}</div>
+      </div>
+    </div>
+    <div class="action-row" style="margin-top:18px">
+      <button class="primary" onclick="downloadCertificatePdf()">DESCARGAR CERTIFICADO EN PDF</button>
+      <button class="secondary" onclick="workerDashboard()">VOLVER A MI RUTA</button>
+    </div>
+  </section>`,false,"cert");
+}
+function downloadCertificatePdf(){
+  if(!currentCertificate){alert("Primero debes cargar el certificado.");return}
+  if(!window.jspdf?.jsPDF){alert("No fue posible cargar el generador PDF. Recarga la página e intenta nuevamente.");return}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+  const w=297,h=210;
+  doc.setFillColor(247,250,252);doc.rect(0,0,w,h,"F");
+  doc.setDrawColor(8,31,43);doc.setLineWidth(3);doc.rect(8,8,w-16,h-16);
+  doc.setDrawColor(243,111,33);doc.setLineWidth(1);doc.rect(13,13,w-26,h-26);
+  doc.setFillColor(8,31,43);doc.rect(18,18,w-36,30,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(24);
+  doc.text("STEEL",25,37);
+  doc.setTextColor(243,111,33);doc.text("HSE LMS",62,37);
+  doc.setTextColor(8,31,43);doc.setFontSize(13);doc.text("CERTIFICADO DE APROBACIÓN",w/2,66,{align:"center"});
+  doc.setFontSize(25);doc.text("INDUCCIÓN HOMBRE NUEVO",w/2,82,{align:"center"});
+  doc.setFont("helvetica","normal");doc.setFontSize(12);doc.text("STEEL INGENIERÍA certifica que",w/2,98,{align:"center"});
+  doc.setFont("helvetica","bold");doc.setFontSize(22);doc.setTextColor(243,111,33);
+  doc.text(String(currentProfile.full_name||"").toUpperCase(),w/2,116,{align:"center"});
+  doc.setTextColor(8,31,43);doc.setFont("helvetica","normal");doc.setFontSize(11);
+  doc.text(`RUT: ${currentProfile.rut||"—"}`,w/2,126,{align:"center"});
+  doc.text("ha aprobado satisfactoriamente los 10 módulos y la evaluación final del curso LMS HSE STEEL.",w/2,140,{align:"center"});
+  doc.setFontSize(10);
+  doc.text(`Emisión: ${formatCertificateDate(currentCertificate.issued_at)}`,35,160);
+  doc.text(`Vigencia: ${formatCertificateDate(currentCertificate.expires_at)}`,w/2,160,{align:"center"});
+  doc.text(`Código: ${currentCertificate.certificate_code}`,w-35,160,{align:"right"});
+  doc.setDrawColor(8,31,43);doc.line(105,178,192,178);
+  doc.setFont("helvetica","bold");doc.text("STEEL INGENIERÍA · HSE",w/2,184,{align:"center"});
+  doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text(`ANTUCOYA · ${currentCertificate.lms_version||"LMS HSE"}`,w/2,190,{align:"center"});
+  const safeName=String(currentProfile.full_name||"trabajador").replace(/[^a-zA-Z0-9]+/g,"_");
+  doc.save(`Certificado_LMS_HSE_STEEL_${safeName}.pdf`);
+}
 
 /* ADMIN */
 async function adminDashboard(){
