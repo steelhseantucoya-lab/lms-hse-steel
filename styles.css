@@ -6,3 +6,22 @@
 @media(max-width:1000px){.module-grid{grid-template-columns:repeat(3,1fr)}.stage-tabs{grid-template-columns:repeat(2,1fr)}.summary-grid,.kpi-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:720px){.layout{grid-template-columns:1fr}.sidebar{display:none}.landing-grid{grid-template-columns:1fr}.module-grid{grid-template-columns:1fr 1fr}.module-header{display:block}.video-banner{grid-template-columns:1fr}.custom-controls{grid-template-columns:auto 1fr}.video-progress,.lock-label{grid-column:1/-1}.summary-grid,.kpi-grid{grid-template-columns:1fr}.content,.hero,.module-header,.video-shell,.stage-tabs{margin-left:12px;margin-right:12px}}
 .video-missing[hidden]{display:none!important;}
+
+
+/* Certificado LMS HSE STEEL */
+.certificate-preview{max-width:1050px;margin:0 auto;background:#fff;padding:14px;border-radius:14px;box-shadow:0 16px 40px rgba(8,31,43,.14)}
+.certificate-border{min-height:560px;border:8px solid #081f2b;outline:2px solid #f36f21;outline-offset:-15px;padding:46px 60px;text-align:center;background:linear-gradient(135deg,#fff 0%,#f5f8fa 70%,#fff3eb 100%)}
+.certificate-brand{font-size:28px;font-weight:900;letter-spacing:1px;color:#081f2b}
+.certificate-brand span{color:#f36f21}
+.certificate-kicker{margin-top:34px;color:#f36f21;font-weight:900;letter-spacing:2px}
+.certificate-border h1{font-size:38px;margin:10px 0 26px;color:#081f2b}
+.certificate-border h2{font-size:30px;color:#f36f21;margin:14px 0 4px}
+.certificate-border p{font-size:16px;line-height:1.55}
+.certificate-rut{font-weight:700;color:#52616b}
+.certificate-data{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;margin:34px auto 26px;max-width:850px}
+.certificate-data div{border-top:2px solid #081f2b;padding-top:10px}
+.certificate-data b,.certificate-data span{display:block}
+.certificate-data b{font-size:11px;color:#f36f21;letter-spacing:1px}
+.certificate-data span{margin-top:5px;font-weight:800;color:#081f2b}
+.certificate-footer{font-size:12px;font-weight:800;color:#52616b;margin-top:26px}
+@media(max-width:700px){.certificate-border{padding:35px 20px;min-height:auto}.certificate-border h1{font-size:27px}.certificate-border h2{font-size:22px}.certificate-data{grid-template-columns:1fr}.certificate-preview{padding:8px}}
