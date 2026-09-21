@@ -7,7 +7,7 @@ const MODULES = [
   {n:5,title:"AGENTES PELIGROSOS",duration:"11:30",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-05/MODULO.5.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-05/MODULO.5.pdf"},
   {n:6,title:"EMERGENCIAS",duration:"10:19",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-06/MODULO.6.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-06/MODULO.6.pdf"},
   {n:7,title:"YO VEO · YO ACTÚO · YO REPORTO",duration:"12:29",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-07/MODULO.7.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-07/MODULO.7.pdf"},
-  {n:8,title:"APTITUD PARA TRABAJAR",duration:"12:30",video:"assets/videos/modulo08.mp4"},
+  {n:8,title:"APTITUD PARA TRABAJAR",duration:"11:23",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-08/MODULO.8.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-08/MODULO.8.pdf"},
   {n:9,title:"VIVIR LA SEGURIDAD EN TERRENO",duration:"15:00",video:"assets/videos/modulo09.mp4"},
   {n:10,title:"DESAFÍO FINAL HSE STEEL",duration:"18:00",video:"assets/videos/modulo10.mp4"}
 ];
@@ -307,7 +307,8 @@ async function startRecap(){
     4:"Los controles críticos evitan consecuencias graves o fatales. Antes de ejecutar, verifica en terreno que cada control del EdC esté presente, implementado y sea efectivo.",
     5:"Reconoce los agentes peligrosos presentes en la tarea, conoce sus vías de exposición y aplica los controles definidos: monitoreo, segregación, ventilación, higiene y EPP adecuado.",
     6:"Ante una emergencia, protege primero tu integridad, reconoce los peligros, activa oportunamente el plan y comunica qué ocurrió, la ubicación exacta, las personas involucradas y los riesgos presentes. Evacúa por las rutas establecidas y dirígete al punto de encuentro.",
-    7:"Observa activamente el entorno, identifica las desviaciones y actúa de manera segura. Si no puedes corregirlas, detén, segrega y comunica. Reporta hechos, ubicación, riesgo y acciones tomadas, y verifica el cierre con evidencia para evitar que el evento se repita."
+    7:"Observa activamente el entorno, identifica las desviaciones y actúa de manera segura. Si no puedes corregirlas, detén, segrega y comunica. Reporta hechos, ubicación, riesgo y acciones tomadas, y verifica el cierre con evidencia para evitar que el evento se repita.",
+    8:"Estar apto para trabajar significa contar con condiciones físicas y mentales que permitan ejecutar la tarea de manera segura. Informa oportunamente la fatiga, somnolencia, malestar, alteraciones emocionales o medicamentos que puedan afectar tu desempeño; no conduzcas ni operes equipos hasta aplicar las medidas definidas."
   };
   const recapMessage=recapMessages[currentModule.n]||"Repasa los conceptos principales del módulo y verifica los controles antes de continuar.";
 
