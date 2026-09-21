@@ -5,7 +5,7 @@ const MODULES = [
   {n:3,title:"ANTES DE HACER, PIENSA",duration:"09:14",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-03/MODULO.3.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-03/MODULO.3.pdf"},
   {n:4,title:"CONTROLES CRÍTICOS — EdC",duration:"10:23",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-04/MODULO.4.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-04/MODULO.4.pdf"},
   {n:5,title:"AGENTES PELIGROSOS",duration:"11:30",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-05/MODULO.5.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-05/MODULO.5.pdf"},
-  {n:6,title:"EMERGENCIAS",duration:"13:30",video:"assets/videos/modulo06.mp4"},
+  {n:6,title:"EMERGENCIAS",duration:"10:19",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-06/MODULO.6.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-06/MODULO.6.pdf"},
   {n:7,title:"YO VEO · YO ACTÚO · YO REPORTO",duration:"13:30",video:"assets/videos/modulo07.mp4"},
   {n:8,title:"APTITUD PARA TRABAJAR",duration:"12:30",video:"assets/videos/modulo08.mp4"},
   {n:9,title:"VIVIR LA SEGURIDAD EN TERRENO",duration:"15:00",video:"assets/videos/modulo09.mp4"},
@@ -305,7 +305,8 @@ async function startRecap(){
     2:"Las reglas que no se negocian protegen la vida y deben cumplirse siempre, sin excepciones ni atajos.",
     3:"Antes de comenzar una tarea, detente y piensa: identifica los peligros, evalúa los riesgos y confirma que los controles estén implementados y sean efectivos.",
     4:"Los controles críticos evitan consecuencias graves o fatales. Antes de ejecutar, verifica en terreno que cada control del EdC esté presente, implementado y sea efectivo.",
-    5:"Reconoce los agentes peligrosos presentes en la tarea, conoce sus vías de exposición y aplica los controles definidos: monitoreo, segregación, ventilación, higiene y EPP adecuado."
+    5:"Reconoce los agentes peligrosos presentes en la tarea, conoce sus vías de exposición y aplica los controles definidos: monitoreo, segregación, ventilación, higiene y EPP adecuado.",
+    6:"Ante una emergencia, protege primero tu integridad, reconoce los peligros, activa oportunamente el plan y comunica qué ocurrió, la ubicación exacta, las personas involucradas y los riesgos presentes. Evacúa por las rutas establecidas y dirígete al punto de encuentro."
   };
   const recapMessage=recapMessages[currentModule.n]||"Repasa los conceptos principales del módulo y verifica los controles antes de continuar.";
 
