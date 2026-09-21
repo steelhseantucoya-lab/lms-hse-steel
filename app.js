@@ -8,7 +8,7 @@ const MODULES = [
   {n:6,title:"EMERGENCIAS",duration:"10:19",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-06/MODULO.6.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-06/MODULO.6.pdf"},
   {n:7,title:"YO VEO · YO ACTÚO · YO REPORTO",duration:"12:29",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-07/MODULO.7.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-07/MODULO.7.pdf"},
   {n:8,title:"APTITUD PARA TRABAJAR",duration:"11:23",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-08/MODULO.8.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-08/MODULO.8.pdf"},
-  {n:9,title:"VIVIR LA SEGURIDAD EN TERRENO",duration:"15:00",video:"assets/videos/modulo09.mp4"},
+  {n:9,title:"VIVIR LA SEGURIDAD EN TERRENO",duration:"10:19",video:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-09/MODULO.9.mp4",recapPdf:"https://github.com/steelhseantucoya-lab/lms-hse-steel/releases/download/modulo-09/MODULO.9.pdf"},
   {n:10,title:"DESAFÍO FINAL HSE STEEL",duration:"18:00",video:"assets/videos/modulo10.mp4"}
 ];
 
@@ -229,11 +229,16 @@ function setupVideo(savedMax,alreadyCompleted){
     if(maxAllowed>0 && maxAllowed<v.duration) v.currentTime=Math.min(maxAllowed,v.duration);
     updateVideoUI();
   });
-// MODO PRUEBA: permite velocidad 2x y adelantar libremente
-v.addEventListener("ratechange", () => {});
-v.addEventListener("seeking", () => {});
-v.addEventListener("timeupdate", async () => {
-  if (v.currentTime > maxAllowed) maxAllowed = v.currentTime;
+  v.addEventListener("ratechange",()=>{
+    if(v.playbackRate!==1) v.playbackRate=1;
+  });
+  v.addEventListener("seeking",()=>{
+    if(!alreadyCompleted && v.currentTime>maxAllowed+1.5) v.currentTime=maxAllowed;
+  });
+  v.addEventListener("timeupdate", async () => {
+    if(alreadyCompleted || v.currentTime<=maxAllowed+1.5){
+      if(v.currentTime>maxAllowed) maxAllowed=v.currentTime;
+    }
   updateVideoUI();
 
   // Marca el video como completado al llegar prácticamente al final
@@ -308,7 +313,8 @@ async function startRecap(){
     5:"Reconoce los agentes peligrosos presentes en la tarea, conoce sus vías de exposición y aplica los controles definidos: monitoreo, segregación, ventilación, higiene y EPP adecuado.",
     6:"Ante una emergencia, protege primero tu integridad, reconoce los peligros, activa oportunamente el plan y comunica qué ocurrió, la ubicación exacta, las personas involucradas y los riesgos presentes. Evacúa por las rutas establecidas y dirígete al punto de encuentro.",
     7:"Observa activamente el entorno, identifica las desviaciones y actúa de manera segura. Si no puedes corregirlas, detén, segrega y comunica. Reporta hechos, ubicación, riesgo y acciones tomadas, y verifica el cierre con evidencia para evitar que el evento se repita.",
-    8:"Estar apto para trabajar significa contar con condiciones físicas y mentales que permitan ejecutar la tarea de manera segura. Informa oportunamente la fatiga, somnolencia, malestar, alteraciones emocionales o medicamentos que puedan afectar tu desempeño; no conduzcas ni operes equipos hasta aplicar las medidas definidas."
+    8:"Estar apto para trabajar significa contar con condiciones físicas y mentales que permitan ejecutar la tarea de manera segura. Informa oportunamente la fatiga, somnolencia, malestar, alteraciones emocionales o medicamentos que puedan afectar tu desempeño; no conduzcas ni operes equipos hasta aplicar las medidas definidas.",
+    9:"Vivir la seguridad en terreno exige disciplina operacional: respeta el plan de tránsito, confirma comunicación antes de acercarte a equipos, mantente fuera de los puntos ciegos, usa siempre el cinturón y detén la maniobra si se pierde el control. Retira herramientas defectuosas y aplica bloqueo y verificación de energía antes de intervenir."
   };
   const recapMessage=recapMessages[currentModule.n]||"Repasa los conceptos principales del módulo y verifica los controles antes de continuar.";
 
