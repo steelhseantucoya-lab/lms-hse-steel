@@ -568,8 +568,126 @@ async function createWorker(){
 }
 
 async function adminModules(){shell(`<section class="content"><h1>MÓDULOS</h1><div class="module-grid">${MODULES.map(m=>`<div class="module-card"><div class="module-visual module-${m.n}"><div class="module-no">${String(m.n).padStart(2,"0")}</div></div><div class="module-info"><h3>${esc(m.title)}</h3><p>${m.finalAssessment?"EVALUACIÓN INTEGRADA":`${m.duration} min`}</p><span class="pill ok">PUBLICADO</span></div></div>`).join("")}</div></section>`,true,"modules")}
-async function adminResults(){shell(`<section class="content"><div class="panel"><h1>RESULTADOS Y BRECHAS</h1><p>Notas, intentos y fallas críticas quedan almacenadas en Supabase.</p></div></section>`,true,"results")}
-async function adminCertificates(){shell(`<section class="content"><div class="panel"><h1>CERTIFICADOS</h1><p>Vigencia de 1 año desde la emisión.</p></div></section>`,true,"certs")}
+async function adminResults(){
+  shell(`<section class="content"><div class="panel"><h1>RESULTADOS Y BRECHAS</h1><p>Cargando resultados...</p></div></section>`,true,"results");
+  const [{data:workers,error:workersError},{data:progress,error:progressError}]=await Promise.all([
+    sb.from("profiles").select("id,full_name,rut,email,job_title,site_area").eq("role","worker").order("full_name"),
+    sb.from("module_progress").select("user_id,module_no,status,score,attempts,critical_failures,approved_at").order("module_no")
+  ]);
+  const error=workersError||progressError;
+  if(error){
+    shell(`<section class="content"><div class="panel"><h1>RESULTADOS Y BRECHAS</h1><div class="warning">No fue posible cargar los resultados: ${esc(error.message)}</div></div></section>`,true,"results");
+    return;
+  }
+  const rows=(workers||[]).map(w=>{
+    const mods=(progress||[]).filter(p=>p.user_id===w.id);
+    const approved=mods.filter(p=>p.status==="approved");
+    const scored=mods.filter(p=>p.score!=null);
+    const average=scored.length?Math.round(scored.reduce((sum,p)=>sum+Number(p.score||0),0)/scored.length):0;
+    const attempts=mods.reduce((sum,p)=>sum+Number(p.attempts||0),0);
+    const critical=mods.reduce((sum,p)=>sum+Number(p.critical_failures||0),0);
+    const final=mods.find(p=>p.module_no===10);
+    const courseApproved=approved.length===10;
+    return {w,mods,approved:approved.length,average,attempts,critical,final,courseApproved};
+  });
+  const approvedCourses=rows.filter(r=>r.courseApproved).length;
+  shell(`<section class="content">
+    <div class="section-title"><div class="eyebrow">SEGUIMIENTO EN TIEMPO REAL</div><h1>RESULTADOS Y BRECHAS</h1><p style="color:#66737d">Resultados registrados en los 10 módulos del curso.</p></div>
+    <div class="kpi-grid" style="margin:18px 0">
+      <div><span>TRABAJADORES</span><b>${rows.length}</b></div>
+      <div><span>CURSOS APROBADOS</span><b>${approvedCourses}</b></div>
+      <div><span>EN PROCESO</span><b>${rows.length-approvedCourses}</b></div>
+      <div><span>CERTIFICABLES</span><b>${approvedCourses}</b></div>
+    </div>
+    <div class="panel" style="overflow-x:auto"><table>
+      <thead><tr><th>TRABAJADOR</th><th>RUT</th><th>AVANCE</th><th>PROMEDIO</th><th>EVALUACIÓN FINAL</th><th>INTENTOS</th><th>FALLAS CRÍTICAS</th><th>ESTADO</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr>
+        <td><b>${esc(r.w.full_name||"—")}</b><br><span style="color:#66737d;font-size:12px">${esc(r.w.email||"")}</span></td>
+        <td>${esc(r.w.rut||"—")}</td>
+        <td><b>${r.approved}/10</b></td>
+        <td>${r.average}%</td>
+        <td>${r.final?.score!=null?`${r.final.score}%`:"—"}</td>
+        <td>${r.attempts}</td>
+        <td>${r.critical}</td>
+        <td><span class="pill ${r.courseApproved?"ok":""}">${r.courseApproved?"CURSO APROBADO":r.approved?"EN PROCESO":"SIN INICIAR"}</span></td>
+      </tr>`).join("")}</tbody>
+    </table></div>
+    <div style="margin-top:18px">
+      ${rows.map(r=>`<details class="panel" style="margin-bottom:10px">
+        <summary style="cursor:pointer;font-weight:800">${esc(r.w.full_name||"TRABAJADOR")} · DETALLE POR MÓDULO</summary>
+        <div style="overflow-x:auto;margin-top:12px"><table><thead><tr><th>MÓDULO</th><th>ESTADO</th><th>NOTA</th><th>INTENTOS</th><th>FALLAS CRÍTICAS</th><th>APROBACIÓN</th></tr></thead>
+        <tbody>${Array.from({length:10},(_,i)=>{
+          const p=r.mods.find(x=>x.module_no===i+1);
+          return `<tr><td>${String(i+1).padStart(2,"0")}</td><td>${p?.status==="approved"?"APROBADO":p?.status==="in_progress"?"EN PROCESO":"NO INICIADO"}</td><td>${p?.score!=null?p.score+"%":"—"}</td><td>${p?.attempts||0}</td><td>${p?.critical_failures||0}</td><td>${p?.approved_at?new Date(p.approved_at).toLocaleDateString("es-CL"):"—"}</td></tr>`;
+        }).join("")}</tbody></table></div>
+      </details>`).join("")}
+    </div>
+  </section>`,true,"results");
+}
+async function adminCertificates(){
+  shell(`<section class="content"><div class="panel"><h1>CERTIFICADOS</h1><p>Cargando certificados...</p></div></section>`,true,"certs");
+  const [{data:certs,error:certError},{data:workers,error:workerError}]=await Promise.all([
+    sb.from("certificates").select("*").order("issued_at",{ascending:false}),
+    sb.from("profiles").select("id,full_name,rut,email,job_title,site_area").eq("role","worker")
+  ]);
+  const error=certError||workerError;
+  if(error){
+    shell(`<section class="content"><div class="panel"><h1>CERTIFICADOS</h1><div class="warning">No fue posible cargar los certificados: ${esc(error.message)}</div></div></section>`,true,"certs");
+    return;
+  }
+  const rows=(certs||[]).map(cert=>({cert,worker:(workers||[]).find(w=>w.id===cert.user_id)}));
+  shell(`<section class="content">
+    <div class="section-title"><div class="eyebrow">CONTROL DOCUMENTAL</div><h1>CERTIFICADOS</h1><p style="color:#66737d">Vigencia de 1 año desde la fecha de emisión.</p></div>
+    <div class="kpi-grid" style="margin:18px 0">
+      <div><span>EMITIDOS</span><b>${rows.length}</b></div>
+      <div><span>VIGENTES</span><b>${rows.filter(r=>r.cert.status==="valid").length}</b></div>
+      <div><span>VENCIDOS / ANULADOS</span><b>${rows.filter(r=>r.cert.status!=="valid").length}</b></div>
+      <div><span>TRABAJADORES CERTIFICADOS</span><b>${new Set(rows.map(r=>r.cert.user_id)).size}</b></div>
+    </div>
+    <div class="panel" style="overflow-x:auto">
+      ${rows.length?`<table><thead><tr><th>TRABAJADOR</th><th>RUT</th><th>CÓDIGO</th><th>EMISIÓN</th><th>VIGENCIA</th><th>VERSIÓN</th><th>ESTADO</th><th>ACCIÓN</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr>
+        <td><b>${esc(r.worker?.full_name||"—")}</b><br><span style="color:#66737d;font-size:12px">${esc(r.worker?.email||"")}</span></td>
+        <td>${esc(r.worker?.rut||"—")}</td><td><b>${esc(r.cert.certificate_code||"—")}</b></td>
+        <td>${formatCertificateDate(r.cert.issued_at)}</td><td>${formatCertificateDate(r.cert.expires_at)}</td>
+        <td>${esc(r.cert.lms_version||"—")}</td><td><span class="pill ${r.cert.status==="valid"?"ok":""}">${r.cert.status==="valid"?"VIGENTE":esc(r.cert.status||"—").toUpperCase()}</span></td>
+        <td><button class="secondary" onclick="downloadAdminCertificate('${r.cert.id}')">DESCARGAR PDF</button></td>
+      </tr>`).join("")}</tbody></table>`:'<div class="warning">Todavía no existen certificados emitidos.</div>'}
+    </div>
+  </section>`,true,"certs");
+}
+async function downloadAdminCertificate(certificateId){
+  const [{data:cert,error:certError},{data:workers,error:workersError}]=await Promise.all([
+    sb.from("certificates").select("*").eq("id",certificateId).single(),
+    sb.from("profiles").select("id,full_name,rut").eq("role","worker")
+  ]);
+  if(certError||workersError||!cert){alert(certError?.message||workersError?.message||"No fue posible cargar el certificado.");return}
+  const worker=(workers||[]).find(w=>w.id===cert.user_id);
+  if(!worker){alert("No se encontró el trabajador asociado.");return}
+  if(!window.jspdf?.jsPDF){alert("No fue posible cargar el generador PDF. Recarga la página.");return}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+  const w=297,h=210;
+  doc.setFillColor(247,250,252);doc.rect(0,0,w,h,"F");
+  doc.setDrawColor(8,31,43);doc.setLineWidth(3);doc.rect(8,8,w-16,h-16);
+  doc.setDrawColor(243,111,33);doc.setLineWidth(1);doc.rect(13,13,w-26,h-26);
+  doc.setFillColor(8,31,43);doc.rect(18,18,w-36,30,"F");
+  doc.setFont("helvetica","bold");doc.setFontSize(24);doc.setTextColor(255,255,255);doc.text("STEEL",25,37);
+  doc.setTextColor(243,111,33);doc.text("HSE LMS",62,37);
+  doc.setTextColor(8,31,43);doc.setFontSize(13);doc.text("CERTIFICADO DE APROBACIÓN",w/2,66,{align:"center"});
+  doc.setFontSize(25);doc.text("INDUCCIÓN HOMBRE NUEVO",w/2,82,{align:"center"});
+  doc.setFont("helvetica","normal");doc.setFontSize(12);doc.text("STEEL INGENIERÍA certifica que",w/2,98,{align:"center"});
+  doc.setFont("helvetica","bold");doc.setFontSize(22);doc.setTextColor(243,111,33);doc.text(String(worker.full_name||"").toUpperCase(),w/2,116,{align:"center"});
+  doc.setTextColor(8,31,43);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text(`RUT: ${worker.rut||"—"}`,w/2,126,{align:"center"});
+  doc.text("ha aprobado satisfactoriamente los 10 módulos y la evaluación final del curso LMS HSE STEEL.",w/2,140,{align:"center"});
+  doc.setFontSize(10);doc.text(`Emisión: ${formatCertificateDate(cert.issued_at)}`,35,160);
+  doc.text(`Vigencia: ${formatCertificateDate(cert.expires_at)}`,w/2,160,{align:"center"});
+  doc.text(`Código: ${cert.certificate_code}`,w-35,160,{align:"right"});
+  doc.setDrawColor(8,31,43);doc.line(105,178,192,178);doc.setFont("helvetica","bold");doc.text("STEEL INGENIERÍA · HSE",w/2,184,{align:"center"});
+  doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text(`ANTUCOYA · ${cert.lms_version||"LMS HSE"}`,w/2,190,{align:"center"});
+  const safeName=String(worker.full_name||"trabajador").replace(/[^a-zA-Z0-9]+/g,"_");
+  doc.save(`Certificado_LMS_HSE_STEEL_${safeName}.pdf`);
+}
 
 async function bootstrap(){
   if(!sb){landing();return}
