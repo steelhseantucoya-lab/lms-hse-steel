@@ -443,60 +443,21 @@ async function workerCertificate(){
     return;
   }
   currentCertificate=cert;
-  shell(`<section class="content">
-    <div class="certificate-preview">
-      <div class="certificate-border">
-        <div class="certificate-brand">STEEL <span>HSE LMS</span></div>
-        <div class="certificate-kicker">CERTIFICADO DE APROBACIÓN</div>
-        <h1>INDUCCIÓN HOMBRE NUEVO</h1>
-        <p>STEEL INGENIERÍA certifica que</p>
-        <h2>${esc(currentProfile.full_name||"")}</h2>
-        <p class="certificate-rut">RUT: ${esc(currentProfile.rut||"—")}</p>
-        <p>ha aprobado satisfactoriamente los 10 módulos y la evaluación final del curso LMS HSE STEEL.</p>
-        <div class="certificate-data">
-          <div><b>EMISIÓN</b><span>${formatCertificateDate(cert.issued_at)}</span></div>
-          <div><b>VIGENCIA</b><span>${formatCertificateDate(cert.expires_at)}</span></div>
-          <div><b>CÓDIGO</b><span>${esc(cert.certificate_code)}</span></div>
-        </div>
-        <div class="certificate-footer">STEEL INGENIERÍA · ANTUCOYA · ${esc(cert.lms_version||"LMS HSE")}</div>
-      </div>
-    </div>
-    <div class="action-row" style="margin-top:18px">
-      <button class="primary" onclick="downloadCertificatePdf()">DESCARGAR CERTIFICADO EN PDF</button>
-      <button class="secondary" onclick="workerDashboard()">VOLVER A MI RUTA</button>
-    </div>
-  </section>`,false,"cert");
+  try{
+    const rows=await loadCertificateRows(cert.user_id);
+    shell(`<section class="content">${certificatePreviewHtml(cert,currentProfile,rows)}
+      <div class="action-row" style="margin-top:18px">
+        <button class="primary" onclick="downloadCertificatePdf()">DESCARGAR CERTIFICADO Y ANEXO · PDF DE 2 HOJAS</button>
+        <button class="secondary" onclick="workerDashboard()">VOLVER A MI RUTA</button>
+      </div></section>`,false,"cert");
+  }catch(error){
+    currentCertificate=null;
+    shell(`<section class="content"><div class="panel"><h2>CERTIFICADO</h2><div class="warning">${esc(error.message)}</div><button class="secondary" onclick="workerCertificate()">REINTENTAR</button></div></section>`,false,"cert");
+  }
 }
-function downloadCertificatePdf(){
-  if(!currentCertificate){alert("Primero debes cargar el certificado.");return}
-  if(!window.jspdf?.jsPDF){alert("No fue posible cargar el generador PDF. Recarga la página e intenta nuevamente.");return}
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
-  const w=297,h=210;
-  doc.setFillColor(247,250,252);doc.rect(0,0,w,h,"F");
-  doc.setDrawColor(8,31,43);doc.setLineWidth(3);doc.rect(8,8,w-16,h-16);
-  doc.setDrawColor(243,111,33);doc.setLineWidth(1);doc.rect(13,13,w-26,h-26);
-  doc.setFillColor(8,31,43);doc.rect(18,18,w-36,30,"F");
-  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(24);
-  doc.text("STEEL",25,37);
-  doc.setTextColor(243,111,33);doc.text("HSE LMS",62,37);
-  doc.setTextColor(8,31,43);doc.setFontSize(13);doc.text("CERTIFICADO DE APROBACIÓN",w/2,66,{align:"center"});
-  doc.setFontSize(25);doc.text("INDUCCIÓN HOMBRE NUEVO",w/2,82,{align:"center"});
-  doc.setFont("helvetica","normal");doc.setFontSize(12);doc.text("STEEL INGENIERÍA certifica que",w/2,98,{align:"center"});
-  doc.setFont("helvetica","bold");doc.setFontSize(22);doc.setTextColor(243,111,33);
-  doc.text(String(currentProfile.full_name||"").toUpperCase(),w/2,116,{align:"center"});
-  doc.setTextColor(8,31,43);doc.setFont("helvetica","normal");doc.setFontSize(11);
-  doc.text(`RUT: ${currentProfile.rut||"—"}`,w/2,126,{align:"center"});
-  doc.text("ha aprobado satisfactoriamente los 10 módulos y la evaluación final del curso LMS HSE STEEL.",w/2,140,{align:"center"});
-  doc.setFontSize(10);
-  doc.text(`Emisión: ${formatCertificateDate(currentCertificate.issued_at)}`,35,160);
-  doc.text(`Vigencia: ${formatCertificateDate(currentCertificate.expires_at)}`,w/2,160,{align:"center"});
-  doc.text(`Código: ${currentCertificate.certificate_code}`,w-35,160,{align:"right"});
-  doc.setDrawColor(8,31,43);doc.line(105,178,192,178);
-  doc.setFont("helvetica","bold");doc.text("STEEL INGENIERÍA · HSE",w/2,184,{align:"center"});
-  doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text(`ANTUCOYA · ${currentCertificate.lms_version||"LMS HSE"}`,w/2,190,{align:"center"});
-  const safeName=String(currentProfile.full_name||"trabajador").replace(/[^a-zA-Z0-9]+/g,"_");
-  doc.save(`Certificado_LMS_HSE_STEEL_${safeName}.pdf`);
+async function downloadCertificatePdf(){
+  if(!currentCertificate){alert("Primero debes cargar el certificado.");return;}
+  try{await exportCertificatePdf(currentCertificate,currentProfile);}catch(error){alert(error.message);}
 }
 
 /* ADMIN */
@@ -651,7 +612,7 @@ async function adminCertificates(){
         <td>${esc(r.worker?.rut||"—")}</td><td><b>${esc(r.cert.certificate_code||"—")}</b></td>
         <td>${formatCertificateDate(r.cert.issued_at)}</td><td>${formatCertificateDate(r.cert.expires_at)}</td>
         <td>${esc(r.cert.lms_version||"—")}</td><td><span class="pill ${r.cert.status==="valid"?"ok":""}">${r.cert.status==="valid"?"VIGENTE":esc(r.cert.status||"—").toUpperCase()}</span></td>
-        <td><button class="secondary" onclick="downloadAdminCertificate('${r.cert.id}')">DESCARGAR PDF</button></td>
+        <td><button class="secondary" onclick="viewAdminCertificate('${r.cert.id}')">VER 2 HOJAS</button> <button class="secondary" onclick="downloadAdminCertificate('${r.cert.id}')">DESCARGAR PDF</button></td>
       </tr>`).join("")}</tbody></table>`:'<div class="warning">Todavía no existen certificados emitidos.</div>'}
     </div>
   </section>`,true,"certs");
@@ -664,29 +625,17 @@ async function downloadAdminCertificate(certificateId){
   if(certError||workersError||!cert){alert(certError?.message||workersError?.message||"No fue posible cargar el certificado.");return}
   const worker=(workers||[]).find(w=>w.id===cert.user_id);
   if(!worker){alert("No se encontró el trabajador asociado.");return}
-  if(!window.jspdf?.jsPDF){alert("No fue posible cargar el generador PDF. Recarga la página.");return}
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
-  const w=297,h=210;
-  doc.setFillColor(247,250,252);doc.rect(0,0,w,h,"F");
-  doc.setDrawColor(8,31,43);doc.setLineWidth(3);doc.rect(8,8,w-16,h-16);
-  doc.setDrawColor(243,111,33);doc.setLineWidth(1);doc.rect(13,13,w-26,h-26);
-  doc.setFillColor(8,31,43);doc.rect(18,18,w-36,30,"F");
-  doc.setFont("helvetica","bold");doc.setFontSize(24);doc.setTextColor(255,255,255);doc.text("STEEL",25,37);
-  doc.setTextColor(243,111,33);doc.text("HSE LMS",62,37);
-  doc.setTextColor(8,31,43);doc.setFontSize(13);doc.text("CERTIFICADO DE APROBACIÓN",w/2,66,{align:"center"});
-  doc.setFontSize(25);doc.text("INDUCCIÓN HOMBRE NUEVO",w/2,82,{align:"center"});
-  doc.setFont("helvetica","normal");doc.setFontSize(12);doc.text("STEEL INGENIERÍA certifica que",w/2,98,{align:"center"});
-  doc.setFont("helvetica","bold");doc.setFontSize(22);doc.setTextColor(243,111,33);doc.text(String(worker.full_name||"").toUpperCase(),w/2,116,{align:"center"});
-  doc.setTextColor(8,31,43);doc.setFont("helvetica","normal");doc.setFontSize(11);doc.text(`RUT: ${worker.rut||"—"}`,w/2,126,{align:"center"});
-  doc.text("ha aprobado satisfactoriamente los 10 módulos y la evaluación final del curso LMS HSE STEEL.",w/2,140,{align:"center"});
-  doc.setFontSize(10);doc.text(`Emisión: ${formatCertificateDate(cert.issued_at)}`,35,160);
-  doc.text(`Vigencia: ${formatCertificateDate(cert.expires_at)}`,w/2,160,{align:"center"});
-  doc.text(`Código: ${cert.certificate_code}`,w-35,160,{align:"right"});
-  doc.setDrawColor(8,31,43);doc.line(105,178,192,178);doc.setFont("helvetica","bold");doc.text("STEEL INGENIERÍA · HSE",w/2,184,{align:"center"});
-  doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text(`ANTUCOYA · ${cert.lms_version||"LMS HSE"}`,w/2,190,{align:"center"});
-  const safeName=String(worker.full_name||"trabajador").replace(/[^a-zA-Z0-9]+/g,"_");
-  doc.save(`Certificado_LMS_HSE_STEEL_${safeName}.pdf`);
+  try{await exportCertificatePdf(cert,worker);}catch(error){alert(error.message);}
+}
+async function viewAdminCertificate(certificateId){
+  try{
+    const {data:cert,error}=await sb.from("certificates").select("*").eq("id",certificateId).single();
+    if(error)throw error;
+    const {data:worker,error:workerError}=await sb.from("profiles").select("id,full_name,rut").eq("id",cert.user_id).single();
+    if(workerError)throw workerError;
+    const rows=await loadCertificateRows(cert.user_id);
+    shell(`<section class="content">${certificatePreviewHtml(cert,worker,rows)}<div class="action-row" style="margin-top:18px"><button class="primary" onclick="downloadAdminCertificate('${cert.id}')">DESCARGAR PDF DE 2 HOJAS</button><button class="secondary" onclick="adminCertificates()">VOLVER A CERTIFICADOS</button></div></section>`,true,"certs");
+  }catch(error){alert(error.message);}
 }
 
 async function bootstrap(){
@@ -700,3 +649,4 @@ async function bootstrap(){
   roleHome();
 }
 bootstrap();
+

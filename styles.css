@@ -25,3 +25,27 @@
 .certificate-data span{margin-top:5px;font-weight:800;color:#081f2b}
 .certificate-footer{font-size:12px;font-weight:800;color:#52616b;margin-top:26px}
 @media(max-width:700px){.certificate-border{padding:35px 20px;min-height:auto}.certificate-border h1{font-size:27px}.certificate-border h2{font-size:22px}.certificate-data{grid-template-columns:1fr}.certificate-preview{padding:8px}}
+
+/* Certificate and annex share the same corporate header. */
+.certificate-header{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:2px solid var(--orange);padding-bottom:12px}
+.certificate-logo{display:block;width:180px;height:auto;max-width:45%;object-fit:contain}
+.certificate-document .certificate-border{background:#fff;padding:28px 38px}
+.certificate-document .certificate-kicker{margin-top:22px}
+.certificate-page{display:block;font-size:11px;font-weight:400;margin-top:8px}
+.certificate-annex{margin-top:24px}
+.certificate-annex .certificate-border{text-align:left}
+.certificate-annex h1{font-size:27px;margin:9px 0 14px}
+.annex-person{display:grid;gap:6px;font-size:12px;margin-bottom:16px;color:#52616b}
+.annex-person b{color:#081f2b;font-size:15px}
+.annex-table-wrap{overflow-x:auto}
+.annex-table{font-size:11px;min-width:640px}
+.annex-table th{background:#081f2b;color:#fff;font-size:10px;padding:9px 8px}
+.annex-table td{padding:8px;line-height:1.4;vertical-align:top}
+.annex-table td:nth-child(2){width:30%}.annex-table td:nth-child(3){width:49%}
+.annex-table td:last-child{text-align:center;white-space:nowrap;color:#14815c}
+.annex-table tbody tr:nth-child(odd){background:#f5f8fa}
+.annex-approved{display:block;font-size:8px;margin-top:3px;font-weight:800}
+.annex-result{display:flex;justify-content:space-between;gap:12px;font-size:12px;margin-top:16px}
+.certificate-annex .annex-note{font-size:10px;color:#52616b;margin:12px 0}
+.certificate-annex .certificate-footer{text-align:center;margin-top:16px}
+@media(max-width:700px){.certificate-document .certificate-border{padding:24px 16px}.certificate-header{gap:10px}.certificate-header .certificate-brand{font-size:20px}.annex-result{flex-direction:column}.certificate-document+.action-row,.action-row{flex-wrap:wrap;gap:10px}}
