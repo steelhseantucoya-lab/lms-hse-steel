@@ -51,3 +51,5 @@
 @media(max-width:700px){.certificate-document .certificate-border{padding:24px 16px}.certificate-header{gap:10px}.certificate-header .certificate-brand{font-size:20px}.annex-result{flex-direction:column}.certificate-document+.action-row,.action-row{flex-wrap:wrap;gap:10px}}
 
 .certificate-signature{width:330px;max-width:70%;margin:40px auto 0;border-top:3px solid #081f2b;padding-top:10px;text-align:center;font-size:13px;font-weight:800;color:#081f2b}
+
+.certificate-signatures{display:flex;justify-content:center;gap:60px;margin:40px auto 0}.certificate-signatures .certificate-signature{width:330px;max-width:42%;margin:0;padding-top:10px;font-size:12px}@media(max-width:700px){.certificate-signatures{gap:20px}.certificate-signatures .certificate-signature{max-width:48%;font-size:9px}}
