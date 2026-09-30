@@ -42,6 +42,7 @@ function certificatePreviewHtml(cert,worker,rows){
       <div class="certificate-data"><div><b>EMISIÓN</b><span>${formatCertificateDate(cert.issued_at)}</span></div>
       <div><b>VIGENCIA</b><span>${formatCertificateDate(cert.expires_at)}</span></div>
       <div><b>CÓDIGO</b><span>${esc(cert.certificate_code)}</span></div></div>
+      <div class="certificate-signature"><span>STEEL INGENIERÍA · HSE</span></div>
       <div class="certificate-footer">${footer}<br><span class="certificate-page">Página 1 de 2</span></div>
     </div></div>
     <div class="certificate-preview certificate-annex"><div class="certificate-border">
@@ -100,7 +101,9 @@ async function buildCertificatePdf(cert,worker,rows){
   doc.setFontSize(10);doc.text('ha aprobado satisfactoriamente los 9 módulos de formación y el módulo 10 de evaluación final',148.5,139,{align:'center'});
   doc.text('del curso LMS HSE STEEL.',148.5,145,{align:'center'});
   const fields=[['EMISIÓN',formatCertificateDate(cert.issued_at),21,77],['VIGENCIA',formatCertificateDate(cert.expires_at),105,77],['CÓDIGO',cert.certificate_code||'—',189,87]];
-  fields.forEach(([label,value,x,width])=>{doc.setDrawColor(8,31,43);doc.line(x,158,x+width,158);doc.setTextColor(243,111,33);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text(label,x+width/2,164,{align:'center'});doc.setTextColor(8,31,43);pdfFit(doc,String(value),width,10);doc.text(String(value),x+width/2,171,{align:'center'});});
+  fields.forEach(([label,value,x,width])=>{doc.setTextColor(243,111,33);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text(label,x+width/2,151,{align:'center'});doc.setTextColor(8,31,43);pdfFit(doc,String(value),width,10);doc.text(String(value),x+width/2,157,{align:'center'});});
+  doc.setDrawColor(8,31,43);doc.setLineWidth(.7);doc.line(105,180,192,180);
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(8,31,43);doc.text('STEEL INGENIERÍA · HSE',148.5,185,{align:'center'});
   doc.addPage('a4','landscape');drawCertificateFrame(doc,logo,cert,2);
   doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(8,31,43);doc.text('ANEXO · MÓDULOS APROBADOS',21,55);
   pdfFit(doc,String(worker.full_name||'').toUpperCase(),255,10);doc.text(String(worker.full_name||'').toUpperCase(),21,62);
