@@ -3,7 +3,7 @@ const CERTIFICATE_LOGO = 'assets/steel-logo.png';
 const CERTIFICATE_SUMMARIES = {
   1:'Cultura preventiva, anticipación de riesgos, cumplimiento de controles y cuidado entre compañeros.',
   2:'Reglas para proteger la vida; cumplimiento sin excepciones ni atajos.',
-  3:'Identificación de peligros, evaluación de riesgos y verificación de controles antes de iniciar.',
+  3:'PASO 0: identificación de peligros, evaluación de riesgos y verificación de controles antes de iniciar.',
   4:'Prevención de eventos graves y fatales; verificación en terreno de controles críticos efectivos.',
   5:'Vías de exposición, monitoreo, segregación, ventilación, higiene y uso de EPP adecuado.',
   6:'Activación del plan, comunicación, evacuación y llegada al punto de encuentro.',
