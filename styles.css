@@ -19,7 +19,7 @@
 .certificate-border p{font-size:16px;line-height:1.55}
 .certificate-rut{font-weight:700;color:#52616b}
 .certificate-data{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;margin:34px auto 26px;max-width:850px}
-.certificate-data div{border-top:2px solid #081f2b;padding-top:10px}
+.certificate-data div{padding-top:10px}
 .certificate-data b,.certificate-data span{display:block}
 .certificate-data b{font-size:11px;color:#f36f21;letter-spacing:1px}
 .certificate-data span{margin-top:5px;font-weight:800;color:#081f2b}
@@ -49,3 +49,5 @@
 .certificate-annex .annex-note{font-size:10px;color:#52616b;margin:12px 0}
 .certificate-annex .certificate-footer{text-align:center;margin-top:16px}
 @media(max-width:700px){.certificate-document .certificate-border{padding:24px 16px}.certificate-header{gap:10px}.certificate-header .certificate-brand{font-size:20px}.annex-result{flex-direction:column}.certificate-document+.action-row,.action-row{flex-wrap:wrap;gap:10px}}
+
+.certificate-signature{width:330px;max-width:70%;margin:40px auto 0;border-top:3px solid #081f2b;padding-top:10px;text-align:center;font-size:13px;font-weight:800;color:#081f2b}
